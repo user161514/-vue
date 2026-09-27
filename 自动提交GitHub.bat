@@ -2,74 +2,85 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-title ×Ô¶¯Ìá½» GitHub - vue-project
+title è‡ªåŠ¨æäº¤ GitHub - vue-project
 
 rem =====================================================
-rem   Ò»¼üÌá½»²¢ÍÆËÍµ½ GitHub ½Å±¾
-rem   ²Ö¿â: https://github.com/user161514/-vue
-rem   Ä¬ÈÏ·ÖÖ§: dev
+rem   ä¸€é”®æäº¤å¹¶æ¨é€åˆ° GitHub è„šæœ¬
+rem   ä»“åº“: https://github.com/user161514/-vue   åˆ†æ”¯: dev
+rem   æœ¬æ–‡ä»¶å¿…é¡»ä¿å­˜ä¸º UTF-8ï¼ˆæ—  BOMï¼‰ç¼–ç ï¼
+rem   ï¼ˆå¼€å¤´ chcp 65001 ä¸æ–‡ä»¶ç¼–ç é…å¥—ï¼Œåˆ«åªæ”¹ä¸€è¾¹ï¼‰
 rem =====================================================
 
 cd /d "%~dp0"
 
 echo ============================================
-echo   ×Ô¶¯Ìá½»²¢ÍÆËÍµ½ GitHub
+echo   è‡ªåŠ¨æäº¤å¹¶æ¨é€åˆ° GitHub
 echo ============================================
 echo.
 
-rem ¼ì²éµ±Ç°Ä¿Â¼ÊÇ·ñÎª git ²Ö¿â
+rem è®© git çŠ¶æ€è¾“å‡ºé‡Œçš„ä¸­æ–‡æ–‡ä»¶åæ­£å¸¸æ˜¾ç¤ºï¼ˆä»…å½±å“æœ¬ä»“åº“æ˜¾ç¤ºï¼‰
+git config core.quotepath false >nul 2>&1
+
+rem æ£€æŸ¥æ˜¯å¦ä¸º git ä»“åº“
 git rev-parse --is-inside-work-tree >nul 2>&1
 if errorlevel 1 (
-    echo [´íÎó] µ±Ç°Ä¿Â¼²»ÊÇ git ²Ö¿â£¡
+    echo [é”™è¯¯] å½“å‰ç›®å½•ä¸æ˜¯ git ä»“åº“ï¼
     pause
     exit /b 1
 )
 
-rem ÏÔÊ¾µ±Ç°×´Ì¬
-echo [1/4] µ±Ç°¹¤×÷Çø±ä¸ü£º
+echo [1/5] å½“å‰å·¥ä½œåŒºå˜æ›´ï¼š
 git status -s
 echo.
 
-rem Èç¹ûÃ»ÓĞ±ä¸üÔòÌáÊ¾²¢ÍË³ö
+rem æ²¡æœ‰ä»»ä½•å˜æ›´æ—¶ï¼ŒåªåŒæ­¥è¿œç¨‹ä»£ç ç„¶åé€€å‡º
 git status -s | findstr /r "." >nul 2>&1
 if errorlevel 1 (
-    echo [ÌáÊ¾] Ã»ÓĞĞèÒªÌá½»µÄ±ä¸ü£¬¹¤×÷ÇøÊÇ¸É¾»µÄ¡£
-    echo        ÈÔ»á³¢ÊÔÀ­È¡Ô¶³Ì×îĞÂ´úÂë...
-    git pull origin dev 2>nul
+    echo [æç¤º] æ²¡æœ‰éœ€è¦æäº¤çš„å˜æ›´ï¼Œå·¥ä½œåŒºæ˜¯å¹²å‡€çš„ã€‚
+    echo        é¡ºä¾¿æ‹‰å–ä¸€ä¸‹è¿œç¨‹æœ€æ–°ä»£ç ...
+    git pull origin dev
     pause
     exit /b 0
 )
 
-rem Ìí¼ÓËùÓĞ±ä¸ü
-echo [2/4] ÕıÔÚÌí¼ÓËùÓĞ±ä¸ü...
+echo [2/5] æ­£åœ¨æ·»åŠ æ‰€æœ‰å˜æ›´...
 git add -A
 if errorlevel 1 (
-    echo [´íÎó] git add Ê§°Ü£¡
+    echo [é”™è¯¯] git add å¤±è´¥ï¼
     pause
     exit /b 1
 )
 
-rem Ìá½»£¨Ìá½»ĞÅÏ¢×Ô¶¯´øÉÏÈÕÆÚÊ±¼ä£©
-set commitMsg=×Ô¶¯Ìá½» %date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%
-echo [3/4] ÕıÔÚÌá½»£º!commitMsg!
+rem ç”¨ PowerShell ç”Ÿæˆæ—¶é—´æˆ³ï¼Œä¸å—ç³»ç»Ÿæ—¥æœŸæ ¼å¼ï¼ˆå‘¨æ—¥ 2026/09/27ï¼‰å½±å“
+set "commitTime="
+for /f "usebackq delims=" %%i in (`powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-dd HH:mm'"`) do set "commitTime=%%i"
+if not defined commitTime set "commitTime=%date% %time:~0,5%"
+set "commitMsg=è‡ªåŠ¨æäº¤ %commitTime%"
+
+echo [3/5] æ­£åœ¨æäº¤ï¼š!commitMsg!
 git commit -m "!commitMsg!"
 if errorlevel 1 (
-    echo [´íÎó] git commit Ê§°Ü£¡
+    echo [é”™è¯¯] git commit å¤±è´¥ï¼
     pause
     exit /b 1
 )
 
-rem ÍÆËÍµ½Ô¶³Ì dev ·ÖÖ§
-echo [4/4] ÕıÔÚÍÆËÍµ½Ô¶³Ì dev ·ÖÖ§...
+echo [4/5] æ­£åœ¨æ‹‰å–è¿œç¨‹æ›´æ–°å¹¶æ¨é€...
+git pull --rebase origin dev
+if errorlevel 1 (
+    echo [é”™è¯¯] åŒæ­¥è¿œç¨‹å¤±è´¥ï¼å¦‚æœ‰å†²çªï¼Œè¿è¡Œ git rebase --abort å¯å–æ¶ˆã€‚
+    pause
+    exit /b 1
+)
 git push origin dev
 if errorlevel 1 (
-    echo [´íÎó] ÍÆËÍÊ§°Ü£¡Çë¼ì²éÍøÂç»òÔ¶³Ì²Ö¿âÅäÖÃ¡£
+    echo [é”™è¯¯] æ¨é€å¤±è´¥ï¼è¯·æ£€æŸ¥ç½‘ç»œæˆ–è¿œç¨‹ä»“åº“é…ç½®ã€‚
     pause
     exit /b 1
 )
 
 echo.
 echo ============================================
-echo   Ìá½»²¢ÍÆËÍ³É¹¦£¡
+echo   æäº¤å¹¶æ¨é€æˆåŠŸï¼
 echo ============================================
 pause
