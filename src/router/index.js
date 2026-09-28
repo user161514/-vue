@@ -2,12 +2,18 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 // 1. 导入你的页面组件（为了测试，可以先随便建一个组件，比如 Home.vue）
-import Home from "@/views/Home.vue";
-import index from "@/view/index/index.vue";
+import login from "@/view/login/login.vue";
+import layoutvue from "@/view/layout/index.vue";
+import dept from "@/view/dept/index.vue";
 
 const routes = [
-  { path: "/", name: "Home", component: Home },
-  { path: "/index", name: "index", component: index },
+  {
+    path: "/",
+    name: "EE",
+    component: layoutvue,
+    children: [{ path: "emp", name: "emp", component: dept }],
+  },
+  { path: "/login", name: "login", component: login },
 ];
 
 const router = createRouter({

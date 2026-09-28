@@ -13,15 +13,12 @@
     <el-container class="main-container">
       <!-- 左侧菜单栏 -->
       <el-aside width="200px" class="aside">
-        <el-menu default-active="1" class="el-menu-vertical-demo">
-          <el-menu router>
+        <el-menu default-active="1" class="el-menu-vertical-demo" router>
           <!-- 首页 -->
-           <router-link to="/index">
-          <el-menu-item index="1">
+          <el-menu-item index="/login">
             <el-icon><Promotion /></el-icon>
-            <span>首页</span>
+            <el-button loading="true">登录</el-button>
           </el-menu-item>
-          </router-link>
           <!-- 班级学员管理 -->
           <el-sub-menu index="/emp">
             <template #title>
@@ -31,7 +28,7 @@
             <el-menu-item index="/clazz">
               <el-icon><HelpFilled /></el-icon>班级管理
             </el-menu-item>
-            <el-menu-item index="emp">
+            <el-menu-item index="/">
               <el-icon><Avatar /></el-icon>学员管理
             </el-menu-item>
           </el-sub-menu>
@@ -57,12 +54,9 @@
               <span>数据统计管理</span>
             </template>
             <!-- 截图里这项没展开，如果有子菜单可以在这里加 -->
-            <el-menu-item index="/login">
-              <el-icon><Document /></el-icon>数据报表
-            </el-menu-item>
           </el-sub-menu>
           </el-menu>
-        </el-menu>
+
       </el-aside>
 
       <!-- 右侧核心展示区域 -->
