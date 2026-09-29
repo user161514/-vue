@@ -4,14 +4,15 @@ import { createRouter, createWebHistory } from "vue-router";
 // 1. 导入你的页面组件（为了测试，可以先随便建一个组件，比如 Home.vue）
 import login from "@/view/login/login.vue";
 import layoutvue from "@/view/layout/index.vue";
-import dept from "@/view/dept/index.vue";
+import DeptView from "@/view/dept/index.vue";
 
 const routes = [
   {
     path: "/",
-    name: "EE",
+    name: "",
     component: layoutvue,
-    children: [{ path: "emp", name: "emp", component: dept }],
+    // redirect: "/index",
+    children: [{ path: "index", name: "emp", component: DeptView }],
   },
   { path: "/login", name: "login", component: login },
 ];

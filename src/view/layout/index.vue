@@ -39,7 +39,7 @@
               <el-icon><Setting /></el-icon>
               <span>系统信息管理</span>
             </template>
-            <el-menu-item index="/dept">
+            <el-menu-item index="/index">
               <el-icon><Aim /></el-icon>部门管理
             </el-menu-item>
             <el-menu-item index="/report">
