@@ -17,7 +17,7 @@
           <!-- 图片中的按钮为橙色文字，使用 link + warning -->
           <el-button link type="primary" size="small" @click="editDept"><el-icon>
               <EditPen />
-            </el-icon >编辑</el-button>
+            </el-icon>编辑</el-button>
           <el-button link type="danger" size="small"><el-icon>
               <DeleteFilled />
             </el-icon>删除</el-button>
@@ -25,13 +25,22 @@
       </el-table-column>
     </el-table>
   </div>
- <!-- 对话框 -->
+  <!-- 对话框 -->
   <el-dialog v-model="dialogFormVisible" :title="change" width="500">
-    <el-form :model="dept">
-      <el-form-item label="*部门名称" :label-width="formLabelWidth">
-        <el-input v-model="dept.name"  placeholder="请输入部门名称"/>
-      </el-form-item>
+
+     <el-form
+    ref="ruleFormRef"
+    style="max-width: 600px"
+    :model="dept"
+    :rules="rules"
+    label-width="auto"
+  >
+    <el-form-item label="部门名称" prop="name">
+      <el-input v-model="dept.name" />
+    </el-form-item>
     </el-form>
+
+
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -44,33 +53,56 @@
 </template>
 
 <script setup>
-import { ref,onMounted} from 'vue'
-import { queryAllApi } from '../../api/dept'
+import { ref, onMounted ,reactive} from 'vue'
+import { queryAllApi, adddept } from '../../api/dept'
 import axios from 'axios'
+import { ElMessage } from 'element-plus'
 
 const emplist = ref([])
-const select=async()=>{
-  const ref1=await queryAllApi();
-  if(ref1.code)
-  {emplist.value=ref1.data}
+const select = async () => {
+  const ref1 = await queryAllApi();
+  if (ref1.code) { emplist.value = ref1.data }
 }
-const save=()=>{
+
+const rules = reactive({
+  name: [
+    { required: true, message: '请输入真正的信息', trigger: 'blur' },
+    { min: 3, max: 5, message: '输入正确!', trigger: 'blur' },
+  ]})
+const save = async () => {
+  const res = await adddept(dept.value)
+  if (res.code) {
+    ElMessage({
+    showClose: true,
+    message: '新增部门成功',
+    type: 'success',
+  })
+    dialogFormVisible.value = false
+    select()
+  }
+  else {
+    ElMessage({
+    showClose: true,
+    message: '新增部门失败',
+    type: 'error',
+  })
+  }
 }
-onMounted(()=>{
+onMounted(() => {
   select()
 })
 const change = ref('')
 const dialogFormVisible = ref(false)
-const dept=ref({"name":""})
+const dept = ref({ "name": "" })
 const formLabelWidth = ref('80px')
-const addDept = () => {
+const addDept = async () => {
   dialogFormVisible.value = true,
-  change.value = '新增部门'
+    change.value = '新增部门'
 }
 
 const editDept = () => {
-  dialogFormVisible.value = true,
-  change.value = '编辑部门'
+  change.value = '编辑部门',
+    dialogFormVisible.value = true
 }
 
 </script>
@@ -91,6 +123,6 @@ const editDept = () => {
 /* 新增按钮样式：底部留白 */
 .add-btn {
   margin-bottom: 15px;
-  margin-top:0%;
+  margin-top: 0%;
 }
 </style>

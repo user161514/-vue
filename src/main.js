@@ -4,7 +4,7 @@ import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
-import router from "./router"; // 👈 1. 引入刚才写的路由文件
+import router from "@/router"; // 👈 1. 引入刚才写的路由文件
 
 const app = createApp(App).use(ElementPlus, { locale: zhCn });
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

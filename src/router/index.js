@@ -5,7 +5,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import login from "@/view/login/login.vue";
 import layoutvue from "@/view/layout/index.vue";
 import DeptView from "@/view/dept/index.vue";
-
 const routes = [
   {
     path: "/",
