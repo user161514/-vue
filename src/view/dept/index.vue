@@ -1,10 +1,77 @@
+<script setup>
+import { ref, onMounted ,reactive} from 'vue'
+import { queryAllApi, adddept } from '../../api/dept'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
+
+const emplist = ref([])
+const select = async () => {
+  const ref1 = await queryAllApi();
+  if (ref1.code) { emplist.value = ref1.data }
+}
+
+const rules = reactive({
+  name: [
+    { required: true, message: '部门名称是必填项', trigger: 'blur' },
+    { min: 2, max: 10, message: '名称长度必须在2-10位!', trigger: 'blur' },
+  ]})
+const save = async () => {
+
+  const submitForm = async () => {
+  if (!deptFormRef.value) return;
+  deptFormRef.value.validate(async(valid) => {
+    if (valid) {
+       const res = await adddept(dept.value)
+  if (res.code) {
+    ElMessage({
+    showClose: true,
+    message: '新增部门成功',
+    type: 'success',
+  })
+    dialogFormVisible.value = false
+    select()
+  }
+    } else {
+     ElMessage({
+    showClose: true,
+    message: '新增部门失败',
+    type: 'error',
+  })
+    }
+  })
+}
+submitForm()
+}
+onMounted(() => {
+  select()
+})
+const change = ref('')
+const dialogFormVisible = ref(false)
+const dept = ref({ "name": "" })
+const formLabelWidth = ref('80px')
+const deptFormRef = ref()
+const addDept = async () => {
+  dialogFormVisible.value = true,
+    change.value = '新增部门'
+}
+
+const editDept = () => {
+  change.value = '编辑部门',
+    dialogFormVisible.value = true
+}
+
+</script>
+
+
+
 <template>
   <div class="dept-container">
     <!-- 标题 -->
     <h1 class="title">部门管理</h1>
 
     <!-- 新增按钮 -->
-    <el-button type="primary" class="add-btn" @Click="addDept">+ 新增部门</el-button>
+    <el-button type="primary" class="add-btn" @Click="addDept" >
+      + 新增部门</el-button>
 
     <!-- 表格 -->
     <el-table :data="emplist" border style="width: 100%"
@@ -29,7 +96,7 @@
   <el-dialog v-model="dialogFormVisible" :title="change" width="500">
 
      <el-form
-    ref="ruleFormRef"
+    ref="deptFormRef"
     style="max-width: 600px"
     :model="dept"
     :rules="rules"
@@ -52,60 +119,6 @@
   </el-dialog>
 </template>
 
-<script setup>
-import { ref, onMounted ,reactive} from 'vue'
-import { queryAllApi, adddept } from '../../api/dept'
-import axios from 'axios'
-import { ElMessage } from 'element-plus'
-
-const emplist = ref([])
-const select = async () => {
-  const ref1 = await queryAllApi();
-  if (ref1.code) { emplist.value = ref1.data }
-}
-
-const rules = reactive({
-  name: [
-    { required: true, message: '请输入真正的信息', trigger: 'blur' },
-    { min: 3, max: 5, message: '输入正确!', trigger: 'blur' },
-  ]})
-const save = async () => {
-  const res = await adddept(dept.value)
-  if (res.code) {
-    ElMessage({
-    showClose: true,
-    message: '新增部门成功',
-    type: 'success',
-  })
-    dialogFormVisible.value = false
-    select()
-  }
-  else {
-    ElMessage({
-    showClose: true,
-    message: '新增部门失败',
-    type: 'error',
-  })
-  }
-}
-onMounted(() => {
-  select()
-})
-const change = ref('')
-const dialogFormVisible = ref(false)
-const dept = ref({ "name": "" })
-const formLabelWidth = ref('80px')
-const addDept = async () => {
-  dialogFormVisible.value = true,
-    change.value = '新增部门'
-}
-
-const editDept = () => {
-  change.value = '编辑部门',
-    dialogFormVisible.value = true
-}
-
-</script>
 
 <style scoped>
 /* 标题样式：添加左侧蓝色竖条 */
