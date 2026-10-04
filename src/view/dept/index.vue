@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted ,reactive} from 'vue'
-import { queryAllApi, adddept,queryreturn } from '../../api/dept'
+import { ref, onMounted, reactive } from 'vue'
+import { queryAllApi, adddept, queryreturn, updatedept } from '../../api/dept'
 import { ElMessage } from 'element-plus'
 
 
@@ -9,38 +9,67 @@ const select = async () => {
   const ref1 = await queryAllApi();
   if (ref1.code) { emplist.value = ref1.data }
 }
-
+const formtitle = ref('')
 const rules = reactive({
   name: [
-    { required: true, message: '部门名称是必填项', trigger: 'blur' },
-    { min: 2, max: 10, message: '名称长度必须在2-10位!', trigger: 'blur' },
-  ]})
+    { required: true, message: '部门名称是必填项', trigger: 'change' },
+    { min: 2, max: 10, message: '名称长度必须在2-10位!', trigger: 'change' },
+  ]
+})
 const save = async () => {
   //函数内部定义一个函数（记得调用）
-    const submitForm = async () => {
-  if (!deptFormRef.value) return;
-  deptFormRef.value.validate(async(valid) => {
-    if (valid) {
-       const res = await adddept(dept.value.name)
-  if (res.code) {
-    ElMessage({
-    showClose: true,
-    message: '新增部门成功',
-    type: 'success',
-  })
-    dialogFormVisible.value = false
-    select()
-  }
-    } else {
-     ElMessage({
-    showClose: true,
-    message: '新增部门失败',
-    type: 'error',
-  })
+  const submitForm = async () => {
+    if (dept.value.id != '') {
+      if (!deptFormRef.value) return;
+      deptFormRef.value.validate(async (valid) => {
+        if (valid) {
+          const res = await updatedept(dept.value.name,dept.value.id)
+          if (res.code) {
+            ElMessage({
+              showClose: true,
+              message: '编辑部门成功',
+              type: 'success',
+            })
+            dialogFormVisible.value = false
+            select()
+          }
+        } else {
+          ElMessage({
+            showClose: true,
+            message: '编辑部门失败',
+            type: 'error',
+          })
+        }
+      })
     }
-  })
-}
-submitForm();
+
+
+    else {
+      if (!deptFormRef.value) return;
+      deptFormRef.value.validate(async (valid) => {
+        if (valid) {
+          const res = await adddept(dept.value.name)
+          if (res.code) {
+            ElMessage({
+              showClose: true,
+              message: '新增部门成功',
+              type: 'success',
+            })
+            dialogFormVisible.value = false
+            select()
+          }
+        } else {
+          ElMessage({
+            showClose: true,
+            message: '新增部门失败',
+            type: 'error',
+          })
+        }
+      })
+    }
+
+  }
+  submitForm();
 }
 const dept = ref({
   name: '',
@@ -61,10 +90,8 @@ const addDept = () => {
   dept.value = {
     name: ''
   }
-  清掉输入框下面红色的报错提示
-  if (deptFormRef.value) {
-    deptFormRef.value.clearValidate()
-  }
+  //清掉输入框下面红色的报错提示
+  deptFormRef.value.resetFields()
 }
 
 
@@ -88,9 +115,8 @@ const edit = async (id) => {
   }
 
   // 把查到的名字填进表单
-  dept.value = {
-    name: row.name
-  }
+  dept.value = row
+  deptFormRef.value.resetFields()
 }
 
 </script>
@@ -103,7 +129,7 @@ const edit = async (id) => {
     <h1 class="title">部门管理</h1>
 
     <!-- 新增按钮 -->
-    <el-button type="primary" class="add-btn" @click="addDept" >
+    <el-button type="primary" class="add-btn" @click="addDept">
       + 新增部门</el-button>
 
     <!-- 表格 -->
@@ -126,18 +152,12 @@ const edit = async (id) => {
     </el-table>
   </div>
   <!-- 对话框 -->
-  <el-dialog v-model="dialogFormVisible" :title="change" width="500">
+  <el-dialog v-model="dialogFormVisible" :title="change" width="500" draggable>
 
-     <el-form
-    ref="deptFormRef"
-    style="max-width: 600px"
-    :model="dept"
-    :rules="rules"
-    label-width="auto"
-  >
-    <el-form-item label="部门名称" prop="name">
-      <el-input v-model="dept.name"></el-input>
-    </el-form-item>
+    <el-form ref="deptFormRef" style="max-width: 600px" :model="dept" :rules="rules" label-width="auto">
+      <el-form-item label="部门名称" prop="name">
+        <el-input v-model="dept.name"></el-input>
+      </el-form-item>
     </el-form>
 
 
