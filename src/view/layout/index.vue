@@ -20,7 +20,7 @@
             <el-button loading="true">登录</el-button>
           </el-menu-item>
           <!-- 班级学员管理 -->
-          <el-sub-menu index="/emp">
+          <el-sub-menu index="/clazz">
             <template #title>
               <el-icon><Grid /></el-icon>
               <span>班级学员管理</span>
@@ -28,7 +28,7 @@
             <el-menu-item index="/clazz">
               <el-icon><HelpFilled /></el-icon>班级管理
             </el-menu-item>
-            <el-menu-item index="/">
+            <el-menu-item index="/emp">
               <el-icon><Avatar /></el-icon>学员管理
             </el-menu-item>
           </el-sub-menu>

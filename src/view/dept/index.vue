@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { queryAllApi, adddept, queryreturn, updatedept } from '../../api/dept'
-import { ElMessage } from 'element-plus'
+import { queryAllApi, adddept, queryreturn, updatedept, deletedept } from '../../api/dept'
+import { ElMessage, ElMessageBox} from 'element-plus'
 
 
 const emplist = ref([])
@@ -16,14 +16,47 @@ const rules = reactive({
     { min: 2, max: 10, message: '名称长度必须在2-10位!', trigger: 'change' },
   ]
 })
+
+// 记得在最上面的 import 里加上 deletedept： 
+// import { queryAllApi, adddept, queryreturn, updatedept, deletedept } from '../../api/dept'
+
+const delete1 =(id) => {
+  ElMessageBox.confirm(
+    '确定要删除吗?',
+    'Warning',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async() => {
+     await deletedept(id)
+      ElMessage({
+        type: 'success',
+        message: '删除成功老铁！！',
+      })
+      select()
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除！！',
+      })
+    })
+}
+
+
+
+
 const save = async () => {
   //函数内部定义一个函数（记得调用）
   const submitForm = async () => {
-    if (dept.value.id != '') {
+    if (dept.value.id) {
       if (!deptFormRef.value) return;
-      deptFormRef.value.validate(async (valid) => {
+      deptFormRef.value.validate(async (valid) => {   //由于只有一个形参，则选择把 (valid) 变成了 valid =>
         if (valid) {
-          const res = await updatedept(dept.value.name,dept.value.id)
+          const res = await updatedept(dept.value.name, dept.value.id)
           if (res.code) {
             ElMessage({
               showClose: true,
@@ -34,9 +67,10 @@ const save = async () => {
             select()
           }
         } else {
+          adddept(dept.value.name)
           ElMessage({
             showClose: true,
-            message: '编辑部门失败',
+            message: '编辑部门失败,已重新添加',
             type: 'error',
           })
         }
@@ -144,7 +178,7 @@ const edit = async (id) => {
           <el-button link type="primary" size="small" @click="edit(scope.row.id)"><el-icon>
               <EditPen />
             </el-icon>编辑</el-button>
-          <el-button link type="danger" size="small"><el-icon>
+          <el-button link type="danger" size="small" plain @click="open" v-on:click="delete1(scope.row.id)"><el-icon>
               <DeleteFilled />
             </el-icon>删除</el-button>
         </template>

@@ -10,3 +10,6 @@ export const queryreturn = (id) => request.get(`dept2/${id}`);
 
 export const updatedept = (name, id) =>
   request.put(`update`, null, { params: { name, id } });
+
+export const deletedept = (id) =>
+  request.delete(`/delete`, { data: { id: id } }, null);

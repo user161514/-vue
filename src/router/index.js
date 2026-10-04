@@ -5,13 +5,16 @@ import { createRouter, createWebHistory } from "vue-router";
 import login from "@/view/login/login.vue";
 import layoutvue from "@/view/layout/index.vue";
 import DeptView from "@/view/dept/index.vue";
+import empview from "@/view/emp/index.vue";
 const routes = [
   {
     path: "/",
     name: "",
     component: layoutvue,
-    redirect: "/index",
-    children: [{ path: "index", name: "emp", component: DeptView }],
+    children: [
+      { path: "index", name: "dept", component: DeptView },
+      { path: "emp", name: "emp", component: empview },
+    ],
   },
   { path: "/login", name: "login", component: login },
 ];
