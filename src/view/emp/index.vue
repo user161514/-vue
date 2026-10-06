@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted ,toRefs } from 'vue'
 import { h } from 'vue'
 import {select} from '../../api/emp'
 import { deletedept ,queryAllApi} from '../../api/dept'
@@ -17,11 +17,17 @@ const selectall = async () => {
 }
 
 
-const select1 = async () => {
+async function select1() {
   emplist.value = []
-  const ref1 = await select(formInline);
-  if(isArrays(ref1.data))
+  const queryParams = {...formInline}
+  if(queryParams.entry_date && queryParams.entry_date.length === 1) {
+    queryParams.begin=queryParams.entry_date[0]
+  }
+    delete queryParams.entry_date//删除这里面的entry_date属性
+  const ref1 = await select(queryParams)
+  if (isArrays(ref1.data))//防止返回的不是数组从而导致报错
     emplist.value = ref1.data
+
   else
     emplist.value = [ref1.data]
   ElMessage('查询成功!')
@@ -44,11 +50,17 @@ onMounted(() => {
 const formInline = reactive({
   name: '',
   gender: '',
-  // entry_date: '',
+  entry_date:[]
 })
 
 const emplist = ref([])
 
+
+const state = reactive({
+  fits: ['contain'],
+  url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+})
+const { fits, url } = toRefs(state)
 
 </script>
 
@@ -56,7 +68,7 @@ const emplist = ref([])
   <div class="emp-container">
     <!-- 标题 -->
     <h1 class="title">员工管理</h1>
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true"  :model="formInline" class="demo-form-inline">
       <el-form-item label="姓名"  >
         <el-input v-model="formInline.name" placeholder="请输入员工姓名" clearable />
       </el-form-item>
@@ -66,10 +78,10 @@ const emplist = ref([])
           <el-option label="女" value="2" />
         </el-select>
       </el-form-item>
-      <!-- <el-form-item label="入职时间">
+      <el-form-item label="入职时间">
         <el-date-picker v-model="formInline.entry_date" type="daterange" range-separator="到" start-placeholder="开始日期"
           end-placeholder="结束日期" :size="size" />
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item class="e4" >
         <el-button type="primary" @click="select1">查询</el-button>
         <el-button type="info" @click="clear">清空</el-button>
@@ -77,10 +89,7 @@ const emplist = ref([])
     </el-form>
 
 
-        <!-- <el-form-item label="入职时间">
-        <el-date-picker v-model="formInline.entry_date" type="daterange" range-separator="到" start-placeholder="开始日期"
-          end-placeholder="结束日期" :size="size" />
-      </el-form-item> -->
+       
 
     <el-table :data="emplist" border style="width: 100%">
       <el-table-column prop="id" label="ID" width="80" align="center" />
@@ -105,14 +114,17 @@ const emplist = ref([])
       <!-- 头像展示，用 el-avatar -->
       <el-table-column label="头像" width="200" align="center">
         <template #default="scope">
-          <!-- <el-avatar v-if="scope.row.avatar" :src="scope.row.avatar" size="small" /> -->
-           <img :src="scope.row.avatar" alt="头像" width="50" height="50" v-if="scope.row.avatar" />
-          <span v-else>无</span>
+         <div class="demo-fit">
+            <div v-for="fit in fits" :key="fit" class="block">
+              <span class="title">{{ fit }}</span>
+              <el-avatar shape="square" :size="100" :fit="fit" :src="url" />
+            </div>
+          </div>
         </template>
       </el-table-column>
 
-      <el-table-column prop="entry_date" label="入职时间" width="200" align="center" />
-      <el-table-column prop="update_time" label="最后操作时间" width="200" align="center" />
+      <el-table-column prop="begin" label="入职时间" width="200" align="center" />
+      <el-table-column prop="end" label="最后操作时间" width="200" align="center" />
     </el-table>
   </div>
 
@@ -120,25 +132,31 @@ const emplist = ref([])
 </template>
 
 <style>
-.demo-form-inline .el-input {
-  --el-input-width: 220px;
+.demo-form-inline {
+  display: flex;
+  flex-wrap: nowrap; /* 🚫 强制不允许换行 */
+  gap: 16px;
+  align-items: center;
+  width: 100%;
 }
 
-.demo-form-inline .el-select {
-  --el-select-width: 220px;
+.demo-form-inline .el-form-item {
+  flex: 1; /* 自动撑满剩余空间 */
+  min-width: 0; /* 🌟 极其关键：防止里面的日期框把外层撑破 */
+  margin-right: 0; /* 去掉原本的margin-right，靠gap控制 */
+  margin-bottom: 0; /* 消除底部默认间距 */
 }
 
-/* 让姓名、性别这两项平分剩余宽度，按钮项保持原样 */
-.demo-form-inline .el-form-item:not(.e4) {
-  margin-right: 16px;
+/* 按钮项绝对不拉伸，且靠右对齐 */
+.demo-form-inline .el-form-item.e4 {
+  flex: none; 
+  margin-left: auto; 
 }
 
-.demo-form-inline .el-form-item:not(.e4) .el-form-item__content {
-  min-width: 0;
-}
-
-.demo-form-inline .el-form-item:not(.e4) .el-input,
-.demo-form-inline .el-form-item:not(.e4) .el-select {
+/* 保证内部控件撑满表单项 */
+.demo-form-inline .el-input,
+.demo-form-inline .el-select,
+.demo-form-inline .el-date-editor {
   width: 100%;
 }
 
@@ -146,5 +164,23 @@ const emplist = ref([])
   font-size: 24px;
   border-left: solid 10px #409eff;
   padding-left: 10px;
+}
+
+/* 头像avarter样式 */
+.demo-fit {
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+}
+.demo-fit .block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+}
+.demo-fit .title {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
 }
 </style>
