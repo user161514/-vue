@@ -109,7 +109,7 @@ const form = ref(
     exprList: [
       // 初始给一行空的，如果不想默认显示一行，就改成 []
       // 注意：这里的字段名要根据你 Java 里 emp_expr 类的实际字段名修改
-      { begin: '', end: '', company: '', job: '' }
+      { company: '', begin: '',end: '', job: '', empdate: []}
     ]
   }
 )
@@ -125,8 +125,12 @@ const region=ref([
 
 import { Plus } from '@element-plus/icons-vue'
 const imageUrl = ref('')
-const handleAvatarSuccess = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw)
+const handleAvatarSuccess = (response) => {
+  console.log(response);
+  if(response.code)
+{
+  form.value.image=response.data;
+}
 }
 const beforeAvatarUpload = (rawFile) => {
   if (rawFile.type !== 'image/jpeg'&&rawFile.type!=='image/png') {
@@ -138,6 +142,23 @@ const beforeAvatarUpload = (rawFile) => {
   }
   return true
 }
+
+
+const addemplist=()=>{
+   form.value.emplist.push({cmpany:'',begin:'',end:'',job:'',empdate:[]})
+}
+
+
+watch(()=>{return form.value.emplist},(newval)=>{
+     if(form.value.emplist&&form.value.emplist.length>0)
+     {
+      form.value.emplist.forEach(element => {
+        element.begin=element.empdate[0]
+        element.end=element.empdate[1]
+      });
+     }
+},{deep:true})
+
 </script>
 
 <template>
@@ -164,7 +185,7 @@ const beforeAvatarUpload = (rawFile) => {
         <row> <el-col :span='24'>
               <el-upload class="avatar-uploader" action="http://localhost:8080/url" :show-file-list="false"
                 :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-                <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                <img v-if="form.image" :src="form.image" class="avatar" />
                 <el-icon v-else class="avatar-uploader-icon">
                   <Plus />
                 </el-icon>
@@ -180,8 +201,11 @@ const beforeAvatarUpload = (rawFile) => {
     </el-form-item>
             </el-col>
         </el-row>
+
+            <el-button type="primary" plain @click="addemplist">+新增员工工作经历</el-button>
       </el-form>
 
+       
     </el-dialog>
 
 
@@ -327,5 +351,27 @@ const beforeAvatarUpload = (rawFile) => {
   margin-bottom: 10px;
   font-size: 14px;
   color: var(--el-text-color-secondary);
+}
+
+
+/* 限制上传后图片的尺寸 */
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+  object-fit: cover; /* 保持比例裁剪，防止拉伸变形 */
+}
+
+/* 上传框默认的加号图标尺寸 */
+.avatar-uploader .avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+  line-height: 178px; /* 垂直居中 */
+  border: 1px dashed var(--el-border-color-dashed); /* 加上虚线边框更好看 */
+  border-radius: 6px;
+  cursor: pointer;
 }
 </style>
