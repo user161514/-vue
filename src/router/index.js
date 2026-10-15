@@ -11,6 +11,7 @@ const routes = [
     path: "/",
     name: "",
     component: layoutvue,
+    redirect: "",
     children: [
       { path: "index", name: "dept", component: DeptView },
       { path: "emp", name: "emp", component: empview },

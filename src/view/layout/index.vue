@@ -6,7 +6,8 @@
       <div class="user-info">
         <span>修改密码</span>
         <span>|</span>
-        <span>退出登录</span>
+
+         <el-button type="warn" plain @click="handleLogout"> 退出登录</el-button>
       </div>
     </el-header>
 
@@ -61,6 +62,7 @@
 
       <!-- 右侧核心展示区域 -->
       <el-main class="main">
+        欢迎来到学生管理页面
        <!-- 路由出口：这里会渲染匹配到的页面 -->
         <router-view></router-view>
       </el-main>
@@ -81,6 +83,15 @@ import {
   DataLine, 
   Document 
 } from '@element-plus/icons-vue'
+import {useRouter} from 'vue-router'
+
+const router=useRouter();
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userInfo');
+  router.push('/login');
+  // 可选：可以发个请求通知后端让 Token 失效
+};
 </script>
 
 <style scoped>

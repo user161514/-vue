@@ -1,9 +1,9 @@
 <script setup>
 import { ref, reactive, onMounted, toRefs, watch } from 'vue'
-import { h } from 'vue'
 import { querylimit } from '../../api/emp'
-import { queryAllApi } from '../../api/dept'
 import { ElMessage } from 'element-plus'
+import { Plus, Delete, Edit } from '@element-plus/icons-vue'
+
 
 //定义表单Form对象formInline
 const formInline = ref({
@@ -59,8 +59,21 @@ const clear = () => {
   formInline.value = { name: "", gender: "", data: [], begin: '', end: '' }
   select1();
 }
+
+
+//token获取
+const token=ref('')
+
+const gettoken=()=>{
+  const tokens=JSON.parse(localStorage.getItem("userInfo")),
+  if(tokens&&tokens.password)
+{
+  token.value=tokens.password
+}
+}
 onMounted(() => {
   select1();
+  gettoken();
 })
 
 
@@ -93,9 +106,10 @@ const handleCurrentChange = (val) => {
 }
 
 const dialogTableVisible = ref(false)
-
+let uid=0
 const form = ref(
   {
+    id_:uid++,
     username: '',      // 用户名
     name: '',          // 姓名
     gender: null,      // 性别 (1:男, 2:女)
@@ -106,7 +120,7 @@ const form = ref(
     entryDate: '',     // 入职日期 (存日期字符串)
     image: '',         // 头像 (存上传后的URL)
     // 工作经历 (包含时间、公司、职位)
-    exprList: [
+    empList: [
       // 初始给一行空的，如果不想默认显示一行，就改成 []
       // 注意：这里的字段名要根据你 Java 里 emp_expr 类的实际字段名修改
       { company: '', begin: '',end: '', job: '', empdate: []}
@@ -123,8 +137,6 @@ const region=ref([
 ])
 
 
-import { Plus } from '@element-plus/icons-vue'
-const imageUrl = ref('')
 const handleAvatarSuccess = (response) => {
   console.log(response);
   if(response.code)
@@ -142,22 +154,57 @@ const beforeAvatarUpload = (rawFile) => {
   }
   return true
 }
-
+const save=()=>{
+  dialogTableVisible.value=true
+  form.value=  {
+    username: '',      // 用户名
+    name: '',          // 姓名
+    gender: null,      // 性别 (1:男, 2:女)
+    phone: '',         // 手机号
+    job: null,         // 职位 (1:学生, 2:工人)
+    salary: null,      // 薪资 (数字)
+    deptId: null,      // 所属部门 (存部门ID)
+    entryDate: '',     // 入职日期 (存日期字符串)
+    image: '',         // 头像 (存上传后的URL)
+    // 工作经历 (包含时间、公司、职位)
+    empList: []
+  }
+}
 
 const addemplist=()=>{
-   form.value.emplist.push({cmpany:'',begin:'',end:'',job:'',empdate:[]})
+   form.value.empList.push({company:'',begin:'',end:'',job:'',empdate:[]})
 }
 
 
-watch(()=>{return form.value.emplist},(newval)=>{
-     if(form.value.emplist&&form.value.emplist.length>0)
+watch(()=>{return form.value.empList},(newval)=>{
+     if(form.value.empList&&form.value.empList.length>0)
      {
-      form.value.emplist.forEach(element => {
+      form.value.empList.forEach(element => {
         element.begin=element.empdate[0]
         element.end=element.empdate[1]
       });
      }
 },{deep:true})
+
+
+//删除员工工作经历
+const deleteemp=(index)=>{
+  form.value.empList.splice(index, 1)
+}
+
+//表单校验规则
+const rules=reactive({
+  username:[
+    {required:true,message:"请输入",trigger:"change"},
+    {min:2,max:20,message:"长度应控制在2-20以内", trigger:"change"},
+    {
+      pattern:/^1\d{2}@qq\.com$/,message:"你的格式不对",trigger:"change",
+    }
+  ]
+})
+
+//管理对话框的标题
+const title=ref("编辑员工")
 
 </script>
 
@@ -165,25 +212,25 @@ watch(()=>{return form.value.emplist},(newval)=>{
   <div class="container">
     <!-- 标题 -->
     <h1 class="title">员工管理</h1>
-    <el-button type="primary" plain @click="dialogTableVisible = true">+新增员工</el-button>
+    <el-button type="primary" plain @click="save">+新增员工</el-button>
 
-    <el-dialog v-model="dialogTableVisible" title="新增员工" width="800" >
+    <el-dialog v-model="dialogTableVisible" :title="title" width="800" >
 
-      <el-form :model="form" label-width="auto" style="max-width: 1200px">
+      <el-form :model="form" label-width="auto" :rules="rules" style="max-width: 1200px">
         <el-row gutter="20">
           <el-col :span="12" >
-            <el-form-item label="用户名">
-              <el-input v-model="username" placeholder="请输入员工用户名,2-20个字" />
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="form.username" placeholder="请输入员工用户名,2-20个字"/>
             </el-form-item>
           </el-col>
           <el-col :span='12'>
             <el-form-item label="姓名">
-              <el-input v-model="name" placeholder="请输入员工姓名,2-10个字" />
+              <el-input v-model="form.name" placeholder="请输入员工姓名,2-10个字" />
             </el-form-item>
           </el-col></el-row>
 
         <row> <el-col :span='24'>
-              <el-upload class="avatar-uploader" action="http://localhost:8080/url" :show-file-list="false"
+              <el-upload class="avatar-uploader" action="http://localhost:8080/url" :show-file-list="true" :headers="{"token":token}"
                 :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                 <img v-if="form.image" :src="form.image" class="avatar" />
                 <el-icon v-else class="avatar-uploader-icon">
@@ -203,6 +250,23 @@ watch(()=>{return form.value.emplist},(newval)=>{
         </el-row>
 
             <el-button type="primary" plain @click="addemplist">+新增员工工作经历</el-button>
+            <el-row>
+         <el-form :inline="true" :model="emp" class="demo-form-inline" v-for="(emp,index) in form.empList">
+            <el-form-item label="公司">
+              <el-input v-model="emp.company" placeholder="请输入公司名称" clearable />
+            </el-form-item>
+            <el-form-item label="职位">
+              <el-select v-model="emp.job" placeholder="请输入植物" clearable>
+                <el-option label="Zone one" value="shanghai" />
+                <el-option label="Zone two" value="beijing" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="日期">
+              <el-date-picker v-model="emp.empdate" type="date" placeholder="Pick a date" clearable />
+            </el-form-item>
+            <el-button type="info" plain @click="deleteemp(index)">删除</el-button>
+          </el-form>
+            </el-row>
       </el-form>
 
        
