@@ -63,13 +63,13 @@ const clear = () => {
 
 //token获取
 const token=ref('')
-
 const gettoken=()=>{
-  const tokens=JSON.parse(localStorage.getItem("userInfo")),
-  if(tokens&&tokens.password)
+  const tokens=JSON.parse(localStorage.getItem("userInfo"));
+  if(tokens&&tokens.token)
 {
-  token.value=tokens.password
+  token.value=tokens.token
 }
+console.log(tokens)
 }
 onMounted(() => {
   select1();
@@ -230,7 +230,7 @@ const title=ref("编辑员工")
           </el-col></el-row>
 
         <row> <el-col :span='24'>
-              <el-upload class="avatar-uploader" action="http://localhost:8080/url" :show-file-list="true" :headers="{"token":token}"
+              <el-upload class="avatar-uploader" action="http://localhost:8080/url" :show-file-list="true" :headers="{tokens:token}"
                 :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                 <img v-if="form.image" :src="form.image" class="avatar" />
                 <el-icon v-else class="avatar-uploader-icon">

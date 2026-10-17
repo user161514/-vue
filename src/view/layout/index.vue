@@ -7,7 +7,7 @@
         <span>修改密码</span>
         <span>|</span>
 
-         <el-button type="warn" plain @click="handleLogout"> 退出登录</el-button>
+         <el-button type="warn" plain @click="handleLogout"> 退出登录[{{ name }}]</el-button>
       </div>
     </el-header>
 
@@ -84,6 +84,7 @@ import {
   Document 
 } from '@element-plus/icons-vue'
 import {useRouter} from 'vue-router'
+import {ref,onMounted} from 'vue'
 
 const router=useRouter();
 const handleLogout = () => {
@@ -92,6 +93,15 @@ const handleLogout = () => {
   router.push('/login');
   // 可选：可以发个请求通知后端让 Token 失效
 };
+
+
+const name=ref('');
+
+onMounted(() => {
+ const res=JSON.parse( localStorage.getItem('userInfo'));
+if(res&&res.username)
+{name.value=res.username;}
+})
 </script>
 
 <style scoped>

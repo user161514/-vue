@@ -1,4 +1,7 @@
 import axios from "axios";
+import { ElMessage } from "element-plus";
+import router from "../router";
+
 const request = axios.create({
   baseURL: "api",
   timeout: 6000000,
@@ -9,7 +12,13 @@ request.interceptors.response.use(
     return response.data; // 第一个参数：请求成功（HTTP 200）时进入
   },
   (error) => {
-    return Promise.reject(error); // 第二个参数：请求失败（404、500、网络超时）时进入，这里的 Promise.reject(error)，你直接翻译成 Java 的 throw new RuntimeException(error) 即可！（会将方法内的错误往外翻）
+    if (error.response.status === 401) {
+      ElMessage.error("登入失败，请重新登录!");
+      router.push("/login");
+    } else {
+      ElMessage.error("接口访问异常");
+    }
+    promise.reject(error);
   },
 );
 
@@ -17,8 +26,8 @@ request.interceptors.response.use(
 request.interceptors.request.use(
   (config) => {
     const info = JSON.parse(localStorage.getItem("userInfo"));
-    if (info && info.password) {
-      config.headers.token = info.password;
+    if (info && info.token) {
+      config.headers.token = info.token;
     }
     return config;
   },

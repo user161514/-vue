@@ -9,15 +9,22 @@ import empview from "@/view/emp/index.vue";
 const routes = [
   {
     path: "/",
-    name: "",
-    component: layoutvue,
-    redirect: "",
+    component: () => import("@/view/layout/index.vue"), // 改为动态导入
+    redirect: "/index",
     children: [
-      { path: "index", name: "dept", component: DeptView },
-      { path: "emp", name: "emp", component: empview },
+      {
+        path: "index",
+        name: "dept",
+        component: () => import("@/view/dept/index.vue"),
+      },
+      {
+        path: "emp",
+        name: "emp",
+        component: () => import("@/view/emp/index.vue"),
+      },
     ],
   },
-  { path: "/login", name: "login", component: login },
+  { path: "/login", component: () => import("@/view/login/login.vue") }, // 改为动态导入
 ];
 
 const router = createRouter({

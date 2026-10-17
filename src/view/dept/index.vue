@@ -139,7 +139,7 @@ const edit = async (id) => {
 
   // 后端返回的 res.data 是个数组，比如 [{ name: "文泽宏" }]
   // 我们只想要里面那一条，所以取出第一项
-  const row = res.data[0]
+  const row = res?.data[0]
 
   // 如果查不到（比如 id 写错了），提示一下就关掉弹窗
   if (!row) {
